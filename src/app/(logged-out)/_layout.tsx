@@ -8,7 +8,6 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import "react-native-reanimated";
 
-import { useColorScheme } from "@/src/hooks/use-color-scheme";
 import { useEffect } from "react";
 
 SplashScreen.setOptions({
@@ -23,8 +22,6 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   const [fontsLoaded] = useFonts({
     Roboto_300Light,
     Roboto_400Regular,

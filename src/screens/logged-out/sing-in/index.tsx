@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import CustomInput from "../../../components/CustomInput/index.";
+import CustomInput from "../../../components/CustomInput";
 import { useSignIn } from "./hooks/useSignn";
 import styles from "./styles";
 
@@ -16,6 +16,7 @@ export default function SignIn() {
     isValid,
     onSubmit,
     passwordValue,
+    theme,
     usernameValue,
   } = useSignIn();
 
@@ -51,9 +52,17 @@ export default function SignIn() {
           />
 
           <TouchableOpacity
-            style={styles.loginButton}
+            style={[
+              styles.loginButton,
+              {
+                backgroundColor: isValid
+                  ? theme.colors.primary
+                  : theme.colors.gray,
+              },
+            ]}
             onPress={handleSubmit(onSubmit)}
             disabled={!isValid}
+            activeOpacity={0.8}
           >
             <Text style={styles.loginButtonText}>Entrar</Text>
           </TouchableOpacity>
@@ -61,6 +70,7 @@ export default function SignIn() {
           <TouchableOpacity
             style={styles.forgotPasswordContainer}
             onPress={handleForgotPassword}
+            activeOpacity={0.8}
           >
             <Text style={styles.forgotPasswordText}>Esqueci a Senha</Text>
           </TouchableOpacity>

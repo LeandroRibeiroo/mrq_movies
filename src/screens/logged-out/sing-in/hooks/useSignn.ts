@@ -1,6 +1,8 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Alert } from "react-native";
+import { useUnistyles } from "react-native-unistyles";
 import { SignInFormData, signInSchema } from "../schemas/authSchema";
 
 const useSignIn = () => {
@@ -19,6 +21,9 @@ const useSignIn = () => {
     },
   });
 
+  const { theme } = useUnistyles();
+  const router = useRouter();
+
   const usernameValue = watch("username");
   const passwordValue = watch("password");
 
@@ -32,7 +37,7 @@ const useSignIn = () => {
 
   const onSubmit = (data: SignInFormData) => {
     console.log("Form data:", data);
-    Alert.alert("Sucesso", "Login realizado com sucesso!");
+    router.replace("/(protected)");
   };
 
   const handleForgotPassword = () => {
@@ -48,6 +53,7 @@ const useSignIn = () => {
     isValid,
     onSubmit,
     passwordValue,
+    theme,
     usernameValue,
   };
 };
