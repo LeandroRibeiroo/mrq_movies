@@ -5,13 +5,13 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { favoritesService } from "../services/overallServices";
 import {
   AddFavoriteDto,
-  ApiError,
   CheckFavoriteResponse,
   FavoritesListResponse,
-} from "../types/api";
+} from "../screens/protected/Favorites/interface/favorites";
+import { favoritesService } from "../screens/protected/Favorites/services/favoritesService";
+import { ApiError } from "../shared/interfaces/api";
 
 export const FAVORITES_QUERY_KEYS = {
   LIST: "favorites-list",

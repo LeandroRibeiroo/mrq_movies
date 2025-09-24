@@ -1,3 +1,3 @@
-import MovieDetailsScreen from "../../screens/protected/details/index";
+import MovieDetailsScreen from "../../screens/protected/Details/DetailsScreen";
 
 export default MovieDetailsScreen;

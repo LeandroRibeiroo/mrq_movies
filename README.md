@@ -112,10 +112,16 @@ src/
    Create a `.env` file in the root directory:
 
    ```env
-   API_BASE_URL=your_api_base_url_here
+   API_BASE_URL=https://movies-db-production-0420.up.railway.app
    ```
 
-4. **Start the development server**
+4. **Login Credentials**
+   Use the following credentials to log in to the app:
+
+   - **Username**: `user`
+   - **Password**: `12345678`
+
+5. **Start the development server**
    ```bash
    npm start
    ```

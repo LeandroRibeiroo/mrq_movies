@@ -4,12 +4,10 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import Config from "react-native-config";
-import { ApiError } from "../types/api";
+import { ApiError } from "../shared/interfaces/api";
 import { tokenStorage } from "./storage";
 
 export const API_BASE_URL = Config.API_BASE_URL || "";
-
-console.log("API_BASE_URL", API_BASE_URL);
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

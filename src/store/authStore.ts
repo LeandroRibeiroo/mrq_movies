@@ -1,30 +1,9 @@
 import { create } from "zustand";
+import { AuthResponseDto } from "../screens/logged-out/SignIn/interface/auth";
 import { clearStorage, tokenStorage, userStorage } from "../services/storage";
-import { AuthResponseDto } from "../types/api";
+import { AuthStore } from "./interfaces/auth-store";
 
-interface User {
-  id: string;
-  username: string;
-  name: string;
-}
-
-interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  token: string | null;
-  isLoading: boolean;
-}
-
-interface AuthActions {
-  login: (authData: AuthResponseDto) => void;
-  logout: () => void;
-  initializeAuth: () => void;
-  setLoading: (loading: boolean) => void;
-}
-
-export interface AuthStore extends AuthState, AuthActions {}
-
-export const useAuthStore = create<AuthStore>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
   isAuthenticated: false,
   user: null,
   token: null,

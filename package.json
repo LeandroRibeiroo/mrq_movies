@@ -13,15 +13,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:signin": "jest --testPathPatterns=SignIn",
-    "test:signin:unit": "jest --testPathPatterns=SignIn.test.tsx",
-    "test:signin:integration": "jest --testPathPatterns=SignIn.integration.simple.test.tsx",
-    "test:integration": "jest --testPathPatterns=integration.test",
     "test:home": "jest --testPathPatterns=HomeScreen",
     "test:favorites": "jest --testPathPatterns=FavoritesScreen",
     "test:details": "jest --testPathPatterns=DetailsScreen",
-    "test:hook": "jest --testPathPatterns=useSignIn",
-    "test:component": "jest --testPathPatterns=SignIn.test.tsx",
-    "test:screens": "jest --testPathPatterns=\"(SignIn|HomeScreen|FavoritesScreen|DetailsScreen)\"",
     "test:verbose": "jest --verbose"
   },
   "dependencies": {

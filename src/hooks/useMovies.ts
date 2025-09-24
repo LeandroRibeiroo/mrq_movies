@@ -4,8 +4,11 @@ import {
   useQuery,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { moviesService } from "../services/overallServices";
-import { ApiError, MovieDetails, MoviesResponse } from "../types/api";
+import { MovieDetails } from "../screens/protected/Details/interface/movieDetails";
+import { moviesService as detailsMoviesService } from "../screens/protected/Details/services/moviesService";
+import { MoviesResponse } from "../screens/protected/Home/interface/movies";
+import { moviesService as homeMoviesService } from "../screens/protected/Home/services/moviesService";
+import { ApiError } from "../shared/interfaces/api";
 
 export const MOVIE_QUERY_KEYS = {
   POPULAR: "popular-movies",
@@ -17,7 +20,7 @@ export const usePopularMovies = (
 ): UseQueryResult<MoviesResponse, ApiError> => {
   return useQuery({
     queryKey: [MOVIE_QUERY_KEYS.POPULAR, page],
-    queryFn: () => moviesService.getPopularMovies(page),
+    queryFn: () => homeMoviesService.getPopularMovies(page),
     staleTime: 5 * 60 * 1000,
   });
 };
@@ -29,7 +32,7 @@ export const useInfinitePopularMovies = (): UseInfiniteQueryResult<
   return useInfiniteQuery({
     queryKey: [MOVIE_QUERY_KEYS.POPULAR, "infinite"],
     queryFn: ({ pageParam = 1 }) =>
-      moviesService.getPopularMovies(pageParam as number),
+      homeMoviesService.getPopularMovies(pageParam as number),
     getNextPageParam: (lastPage) => {
       if (lastPage.page < lastPage.total_pages) {
         return lastPage.page + 1;
@@ -46,7 +49,7 @@ export const useMovieDetails = (
 ): UseQueryResult<MovieDetails, ApiError> => {
   return useQuery({
     queryKey: [MOVIE_QUERY_KEYS.DETAILS, movieId],
-    queryFn: () => moviesService.getMovieDetails(movieId),
+    queryFn: () => detailsMoviesService.getMovieDetails(movieId),
     enabled: !!movieId,
     staleTime: 10 * 60 * 1000,
   });

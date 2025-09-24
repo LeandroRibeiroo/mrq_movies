@@ -1,7 +1,11 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import { authService } from "../services/overallServices";
+import {
+  AuthResponseDto,
+  SignInDto,
+} from "../screens/logged-out/SignIn/interface/auth";
+import { authService } from "../screens/logged-out/SignIn/services/authService";
+import { ApiError } from "../shared/interfaces/api";
 import { useAuthStore } from "../store/authStore";
-import { ApiError, AuthResponseDto, SignInDto } from "../types/api";
 
 export const useSignIn = (): UseMutationResult<
   AuthResponseDto,

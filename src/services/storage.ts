@@ -1,18 +1,15 @@
 import { MMKV } from "react-native-mmkv";
 
-// Create MMKV instance
 export const storage = new MMKV({
   id: "brq-movies-storage",
   encryptionKey: "brq-movies-encryption-key",
 });
 
-// Storage keys
 const STORAGE_KEYS = {
   ACCESS_TOKEN: "access_token",
   USER_DATA: "user_data",
 } as const;
 
-// Token management
 export const tokenStorage = {
   getToken: (): string | null => {
     return storage.getString(STORAGE_KEYS.ACCESS_TOKEN) ?? null;
@@ -31,7 +28,6 @@ export const tokenStorage = {
   },
 };
 
-// User data management
 export const userStorage = {
   getUser: () => {
     const userData = storage.getString(STORAGE_KEYS.USER_DATA);
@@ -47,7 +43,6 @@ export const userStorage = {
   },
 };
 
-// Clear all storage
 export const clearStorage = (): void => {
   storage.clearAll();
 };
