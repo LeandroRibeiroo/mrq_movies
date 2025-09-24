@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useLogout } from "../../hooks/useAuth";
 import FavoritesScreen from "../../screens/protected/favorites/index";
 import HomeScreen from "../../screens/protected/home/index";
 
@@ -20,6 +21,7 @@ const Tab = createMaterialTopTabNavigator();
 function CustomHeader() {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const router = useRouter();
+  const logout = useLogout();
 
   const handleMenuPress = () => {
     setIsMenuVisible(!isMenuVisible);
@@ -27,7 +29,7 @@ function CustomHeader() {
 
   const handleSignOut = () => {
     setIsMenuVisible(false);
-    // Navigate to login screen
+    logout();
     router.replace("/(logged-out)");
   };
 

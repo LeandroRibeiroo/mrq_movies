@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Alert } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
+import { useSignIn as useApiSignIn } from "../../../../hooks/useAuth";
 import { SignInFormData, signInSchema } from "../schemas/authSchema";
 
 const useSignIn = () => {
@@ -23,6 +24,7 @@ const useSignIn = () => {
 
   const { theme } = useUnistyles();
   const router = useRouter();
+  const signInMutation = useApiSignIn();
 
   const usernameValue = watch("username");
   const passwordValue = watch("password");
@@ -36,8 +38,17 @@ const useSignIn = () => {
   };
 
   const onSubmit = (data: SignInFormData) => {
-    console.log("Form data:", data);
-    router.replace("/(protected)");
+    signInMutation.mutate(data, {
+      onSuccess: () => {
+        router.replace("/(protected)");
+      },
+      onError: (error) => {
+        Alert.alert(
+          "Erro no Login",
+          error.message || "Erro ao fazer login. Tente novamente."
+        );
+      },
+    });
   };
 
   const handleForgotPassword = () => {
@@ -55,6 +66,7 @@ const useSignIn = () => {
     passwordValue,
     theme,
     usernameValue,
+    isLoading: signInMutation.isPending,
   };
 };
 

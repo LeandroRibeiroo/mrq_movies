@@ -1,59 +1,85 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   ScrollView,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import ErrorComponent from "../../../components/ErrorComponent";
+import { useFavoritesList } from "../../../hooks/useFavorites";
+import { styles as stylesFn } from "./styles";
 
 const { width } = Dimensions.get("window");
-const ITEM_WIDTH = (width - 60) / 2; // 60 = padding + gap
-
-// Mock favorite movies data - in a real app this would come from state/storage
-const favoriteMovies = [
-  {
-    id: 1,
-    title: "Mission: Impossible",
-    poster: "https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg",
-  },
-  {
-    id: 4,
-    title: "John Wick 4",
-    poster: "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
-  },
-  {
-    id: 5,
-    title: "Avatar",
-    poster: "https://image.tmdb.org/t/p/w500/jRXYjXNq0Cs2TcJjLkki24MLp7u.jpg",
-  },
-];
+const ITEM_WIDTH = (width - 60) / 2;
 
 export default function FavoritesScreen() {
   const router = useRouter();
+  const { data: favoritesData, isLoading, error } = useFavoritesList();
+
+  const favoriteMovies = favoritesData?.favorites || [];
+
+  const styles = stylesFn(ITEM_WIDTH);
 
   const renderMovieItem = (
-    movie: (typeof favoriteMovies)[0],
+    favorite: (typeof favoriteMovies)[0],
     index: number
   ) => (
     <TouchableOpacity
-      key={movie.id}
-      testID={`favorite-item-${movie.id}`}
+      key={favorite.id}
+      testID={`favorite-item-${favorite.movieId}`}
       style={[styles.movieItem, { marginRight: index % 2 === 0 ? 20 : 0 }]}
       onPress={() => {
-        router.push(`/(protected)/details?movieId=${movie.id}` as any);
+        router.push(`/(protected)/details?movieId=${favorite.movieId}` as any);
       }}
     >
       <Image
-        testID={`favorite-poster-${movie.id}`}
-        source={{ uri: movie.poster }}
+        testID={`favorite-poster-${favorite.movieId}`}
+        source={{
+          uri: favorite.movieData?.poster_path
+            ? `https://image.tmdb.org/t/p/w500${favorite.movieData.poster_path}`
+            : "https://via.placeholder.com/500x750?text=No+Image",
+        }}
         style={styles.moviePoster}
         resizeMode="cover"
       />
     </TouchableOpacity>
   );
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color="#EC8B00" />
+        <Text style={styles.loadingText}>Carregando favoritos...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorComponent
+        title="Erro ao carregar favoritos"
+        message="Não foi possível carregar sua lista de favoritos. Verifique sua conexão e tente novamente."
+        onRetry={() => {
+          // The query will automatically refetch
+        }}
+      />
+    );
+  }
+
+  if (favoriteMovies.length === 0) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Text style={styles.emptyText}>Nenhum filme favorito</Text>
+        <Text style={styles.emptySubText}>
+          Adicione filmes aos seus favoritos para vê-los aqui
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View testID="favorites-container" style={styles.container}>
@@ -63,36 +89,11 @@ export default function FavoritesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View testID="favorites-grid" style={styles.moviesGrid}>
-          {favoriteMovies.map((movie, index) => renderMovieItem(movie, index))}
+          {favoriteMovies.map((favorite, index) =>
+            renderMovieItem(favorite, index)
+          )}
         </View>
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create(({ colors }) => ({
-  container: {
-    flex: 1,
-    backgroundColor: colors.neutral,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 100, // Extra padding for bottom
-  },
-  moviesGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  movieItem: {
-    width: ITEM_WIDTH,
-    marginBottom: 20,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  moviePoster: {
-    width: "100%",
-    height: ITEM_WIDTH * 1.5, // 3:2 aspect ratio for movie posters
-    borderRadius: 12,
-  },
-}));

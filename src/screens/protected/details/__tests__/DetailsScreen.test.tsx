@@ -2,7 +2,6 @@ import { fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
 import MovieDetailsScreen from "../index";
 
-// Mock Ionicons
 jest.mock("@expo/vector-icons", () => ({
   Ionicons: ({ testID, name, size, color }: any) => {
     const { View } = require("react-native");
@@ -10,7 +9,6 @@ jest.mock("@expo/vector-icons", () => ({
   },
 }));
 
-// Mock the useDetails hook directly
 const mockBack = jest.fn();
 const mockToggleFavorite = jest.fn();
 
@@ -25,18 +23,6 @@ jest.mock("../hooks/useDetails", () => ({
     imageOpacity: 1,
     imageScale: 1,
     isFavorite: false,
-    movie: {
-      id: 1,
-      title: "Missão: Impossível 7",
-      originalTitle: "Mission: Impossible – Dead Reckoning Part One",
-      backdropUrl:
-        "https://image.tmdb.org/t/p/w1280/628Dep6AxEtDxjZoGP78TsOxYbK.jpg",
-      synopsis:
-        "Em Missão Impossível 7: Acerto de Contas Parte 1, Ethan Hunt (Tom Cruise) e a equipe do IMF...",
-      genre: "Ação, Aventura, Thriller",
-      director: "Christopher McQuarrie",
-      cast: "Tom Cruise, Hayley Atwell, Ving Rhames, Simon Pegg, Rebecca Ferguson",
-    },
     scrollY: { current: 0 },
     styles: {
       container: {},

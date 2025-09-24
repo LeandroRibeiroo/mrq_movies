@@ -2,7 +2,6 @@ import { fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
 import FavoritesScreen from "../index";
 
-// Mock expo-router
 const mockPush = jest.fn();
 jest.mock("expo-router", () => ({
   useRouter: () => ({
@@ -10,7 +9,6 @@ jest.mock("expo-router", () => ({
   }),
 }));
 
-// Mock react-native-unistyles
 jest.mock("react-native-unistyles", () => ({
   StyleSheet: {
     create: (styles: any) => styles,

@@ -1,15 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect } from "react";
 import {
+  ActivityIndicator,
   Animated,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import ErrorComponent from "../../../components/ErrorComponent";
+import { useErrorHandler } from "../../../hooks/useErrorHandler";
 import { useDetails } from "./hooks/useDetails";
 
 export default function MovieDetailsScreen() {
+  const { handleError } = useErrorHandler();
+
   const {
     HEADER_MAX_HEIGHT,
     handleContentSizeChange,
@@ -25,7 +30,30 @@ export default function MovieDetailsScreen() {
     styles,
     titleOpacity,
     toggleFavorite,
+    error,
+    toggleLoading,
   } = useDetails();
+
+  useEffect(() => {
+    if (error) {
+      handleError(error);
+    }
+  }, [error, handleError]);
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#16171B" }}>
+        <StatusBar barStyle="light-content" backgroundColor="#16171B" />
+        <ErrorComponent
+          title="Erro ao carregar filme"
+          message="Não foi possível carregar os detalhes do filme. Verifique sua conexão e tente novamente."
+          onRetry={() => {
+            // The query will automatically refetch
+          }}
+        />
+      </View>
+    );
+  }
 
   return (
     <View testID="details-container" style={styles.container}>
@@ -78,15 +106,20 @@ export default function MovieDetailsScreen() {
             testID="details-favorite-button"
             style={styles.headerButton}
             onPress={toggleFavorite}
+            disabled={toggleLoading}
           >
-            <Ionicons
-              testID={
-                isFavorite ? "details-heart-filled" : "details-heart-outline"
-              }
-              name={isFavorite ? "heart" : "heart-outline"}
-              size={24}
-              color={isFavorite ? "#EC8B00" : "#FFFFFF"}
-            />
+            {toggleLoading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Ionicons
+                testID={
+                  isFavorite ? "details-heart-filled" : "details-heart-outline"
+                }
+                name={isFavorite ? "heart" : "heart-outline"}
+                size={24}
+                color={isFavorite ? "#EC8B00" : "#FFFFFF"}
+              />
+            )}
           </TouchableOpacity>
         </View>
       </Animated.View>

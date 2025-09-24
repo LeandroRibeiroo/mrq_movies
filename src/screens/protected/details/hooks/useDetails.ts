@@ -1,7 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
-import { Animated, Dimensions } from "react-native";
-import { movieData } from "../mocks";
+import { Alert, Animated, Dimensions } from "react-native";
+import {
+  useCheckFavorite,
+  useToggleFavorite,
+} from "../../../../hooks/useFavorites";
+import { useMovieDetails } from "../../../../hooks/useMovies";
 import { styles as stylesFn } from "../styles";
 
 const useDetails = () => {
@@ -13,14 +17,46 @@ const useDetails = () => {
   const router = useRouter();
   const { movieId } = useLocalSearchParams();
   const scrollY = useRef(new Animated.Value(0)).current;
-  const [isFavorite, setIsFavorite] = useState(false);
   const [contentHeight, setContentHeight] = useState(0);
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
 
   const movieIdString = Array.isArray(movieId) ? movieId[0] : movieId;
   const movieIdNumber = movieIdString ? parseInt(movieIdString) : 1;
-  const movie =
-    movieData[movieIdNumber as keyof typeof movieData] || movieData[1];
+
+  const {
+    data: movieDetails,
+    isLoading: movieLoading,
+    error: movieError,
+  } = useMovieDetails(movieIdNumber);
+
+  const { data: favoriteStatus, isLoading: favoriteLoading } =
+    useCheckFavorite(movieIdNumber);
+
+  const {
+    toggleFavorite: apiToggleFavorite,
+    isLoading: toggleLoading,
+    error: toggleError,
+  } = useToggleFavorite();
+
+  const movie = {
+    id: movieDetails?.id,
+    title: movieDetails?.title,
+    originalTitle: movieDetails?.original_title,
+    poster: `https://image.tmdb.org/t/p/w500${movieDetails?.poster_path}`,
+    backdropUrl: `https://image.tmdb.org/t/p/w1280${movieDetails?.backdrop_path}`,
+    synopsis: movieDetails?.overview,
+    year: movieDetails?.release_date
+      ? new Date(movieDetails?.release_date).getFullYear().toString()
+      : "N/A",
+    duration: movieDetails?.runtime ? `${movieDetails.runtime} min` : "N/A",
+    genre: movieDetails?.genres?.map((g) => g.name).join(", ") || "N/A",
+    director: "N/A",
+    cast: "N/A",
+    rating: movieDetails?.vote_average?.toFixed(1) || "N/A",
+    isFavorite: favoriteStatus?.isFavorite || false,
+  };
+
+  const isFavorite = favoriteStatus?.isFavorite || false;
 
   const styles = stylesFn(width);
 
@@ -69,7 +105,17 @@ const useDetails = () => {
   };
 
   const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
+    if (toggleLoading) return;
+
+    apiToggleFavorite(movieIdNumber, isFavorite || false);
+
+    if (toggleError) {
+      Alert.alert(
+        "Erro",
+        "Não foi possível atualizar os favoritos. Tente novamente.",
+        [{ text: "OK" }]
+      );
+    }
   };
 
   const handleContentSizeChange = (
@@ -100,6 +146,9 @@ const useDetails = () => {
     styles,
     titleOpacity,
     toggleFavorite,
+    isLoading: movieLoading || favoriteLoading,
+    error: movieError,
+    toggleLoading,
   };
 };
 

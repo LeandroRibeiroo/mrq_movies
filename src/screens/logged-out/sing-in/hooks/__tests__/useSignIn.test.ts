@@ -2,7 +2,6 @@ import { act, renderHook } from "@testing-library/react-hooks";
 import { Alert } from "react-native";
 import { useSignIn } from "../useSignn";
 
-// Mock expo-router
 const mockReplace = jest.fn();
 jest.mock("expo-router", () => ({
   useRouter: () => ({
@@ -10,7 +9,6 @@ jest.mock("expo-router", () => ({
   }),
 }));
 
-// Mock react-native-unistyles
 jest.mock("react-native-unistyles", () => ({
   useUnistyles: () => ({
     theme: {
@@ -24,14 +22,12 @@ jest.mock("react-native-unistyles", () => ({
   }),
 }));
 
-// Mock react-native Alert
 jest.mock("react-native", () => ({
   Alert: {
     alert: jest.fn(),
   },
 }));
 
-// Mock console.log
 const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
 describe("useSignIn Hook", () => {
