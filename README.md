@@ -24,22 +24,46 @@ A modern React Native movie application built with Expo, featuring user authenti
 
 ## 🏗️ Architecture
 
-The application follows a modern React Native architecture with clean separation of concerns:
-
 ```
 src/
-├── app/                    # Expo Router file-based routing
-│   ├── (logged-out)/      # Authentication screens
-│   └── (protected)/       # Authenticated user screens
-├── components/            # Reusable UI components
-├── hooks/                 # Custom React hooks
-├── providers/             # Context providers
-├── screens/              # Screen components
-├── services/             # API services and data layer
-├── store/                # Zustand state management
-├── theme/                # Styling and theme configuration
-└── types/                # TypeScript type definitions
+├── app/                           # Expo Router file-based routing
+│   ├── (logged-out)/             # Authentication screens
+│   └── (protected)/              # Authenticated user screens
+├── components/                    # Reusable UI components
+│   ├── CustomInput/              # Form input component
+│   ├── ErrorBoundary/            # Error handling component
+│   └── ErrorComponent/           # Error display component
+├── hooks/                         # Custom React hooks
+├── interfaces/                    # Shared TypeScript interfaces
+├── providers/                     # Context providers
+├── screens/                       # Screen components organized by domain
+│   ├── logged-out/
+│   │   └── SignIn/               # Authentication domain
+│   │       ├── interface/        # Auth-specific interfaces
+│   │       ├── services/         # Auth-specific services
+│   │       └── hooks/            # Auth-specific hooks
+│   └── protected/
+│       ├── Home/                 # Movie browsing domain
+│       │   ├── interface/        # Movie interfaces
+│       │   └── services/         # Movie services
+│       ├── Details/              # Movie details domain
+│       │   ├── interface/        # Movie details interfaces
+│       │   └── services/         # Movie details services
+│       └── Favorites/            # Favorites domain
+│           ├── interface/        # Favorites interfaces
+│           └── services/         # Favorites services
+├── services/                      # Shared API services
+├── store/                         # Zustand state management
+└── theme/                         # Styling and theme configuration
 ```
+
+### 🎯 SOLID Principles Implementation
+
+- **Single Responsibility Principle (SRP)**: Each service, interface, and component has a single, well-defined responsibility
+- **Open/Closed Principle (OCP)**: Components are open for extension but closed for modification
+- **Liskov Substitution Principle (LSP)**: Interfaces are properly implemented across all components
+- **Interface Segregation Principle (ISP)**: Domain-specific interfaces are separated by functionality
+- **Dependency Inversion Principle (DIP)**: High-level modules depend on abstractions, not concretions
 
 ## 🛠️ Tech Stack
 
@@ -134,7 +158,7 @@ src/
 
 ## 🧪 Testing
 
-The application includes comprehensive testing coverage:
+The application includes comprehensive testing coverage with **131 tests** across **5 test suites**, achieving **100% test success rate**:
 
 ```bash
 # Run all tests
@@ -146,18 +170,29 @@ npm run test:watch
 # Run tests with coverage
 npm run test:coverage
 
-# Run specific test suites
-npm run test:signin      # Sign-in tests
-npm run test:home        # Home screen tests
-npm run test:favorites   # Favorites tests
-npm run test:details     # Details screen tests
 ```
 
-### Test Structure
+### 📊 Test Coverage
 
-- **Unit Tests**: Individual component and hook testing
-- **Integration Tests**: Feature workflow testing
-- **Screen Tests**: Complete screen functionality testing
+- **✅ SignIn Tests**: Authentication flow and form validation
+- **✅ useSignIn Hook Tests**: Custom hook functionality with React Query integration
+- **✅ HomeScreen Tests**: Movie browsing with infinite scroll and navigation
+- **✅ DetailsScreen Tests**: Movie details display and favorites toggle
+- **✅ FavoritesScreen Tests**: Favorites management and navigation
+
+### 🧪 Test Structure
+
+- **Unit Tests**: Individual component and hook testing with comprehensive mocking
+- **Screen Tests**: Complete screen functionality testing with QueryClient integration
+- **Mock Strategy**: Inline mocks for better Jest compatibility and maintainability
+
+### 🔧 Testing Technologies
+
+- **Jest**: Testing framework with comprehensive configuration
+- **React Testing Library**: Component testing utilities
+- **React Native Testing Library**: Mobile-specific testing helpers
+- **TanStack Query Testing**: QueryClient integration for React Query testing
+- **Mocking**: Comprehensive mocking of external dependencies (Expo Router, MMKV, etc.)
 
 ## 📡 API Integration
 
@@ -232,6 +267,9 @@ npm run reset-project # Reset to blank project template
 - **Code Splitting**: Lazy loading of screens and components
 - **Memory Management**: Proper cleanup of resources
 - **Bundle Optimization**: Minimized app size
+- **SOLID Architecture**: Maintainable and scalable code structure
+- **Domain-Driven Design**: Clear separation of concerns for better performance
+- **TypeScript**: Compile-time error detection and optimization
 
 ## 🤝 Contributing
 
