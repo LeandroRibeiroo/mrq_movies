@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, waitFor } from "@testing-library/react-native";
 import React from "react";
 import { Alert } from "react-native";
-import { authService } from "../../../../services/movieService";
+import { authService } from "../../../../services/overallServices";
 import { useAuthStore } from "../../../../store/authStore";
 import { useSignIn } from "../hooks/useSignn";
 

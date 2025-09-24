@@ -4,7 +4,7 @@ import {
   useQuery,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { moviesService } from "../services/movieService";
+import { moviesService } from "../services/overallServices";
 import { ApiError, MovieDetails, MoviesResponse } from "../types/api";
 
 export const MOVIE_QUERY_KEYS = {

@@ -41,3 +41,15 @@ app-example
 # generated native folders
 /ios
 /android
+
+# envs
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.test
+.env.production
+# react-native-config codegen
+ios/tmp.xcconfig

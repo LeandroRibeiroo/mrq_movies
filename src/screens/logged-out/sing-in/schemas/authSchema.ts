@@ -8,7 +8,8 @@ export const signInSchema = yup.object({
   password: yup
     .string()
     .required("Senha é obrigatória")
-    .min(6, "Senha deve ter pelo menos 6 caracteres"),
+    .min(6, "Senha deve ter pelo menos 6 caracteres")
+    .matches(/^\d+$/, "Senha deve conter apenas números"),
 });
 
 export type SignInFormData = yup.InferType<typeof signInSchema>;

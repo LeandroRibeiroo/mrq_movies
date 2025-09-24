@@ -5,7 +5,7 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { favoritesService } from "../services/movieService";
+import { favoritesService } from "../services/overallServices";
 import {
   AddFavoriteDto,
   ApiError,

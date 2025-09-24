@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import { authService } from "../services/movieService";
+import { authService } from "../services/overallServices";
 import { useAuthStore } from "../store/authStore";
 import { ApiError, AuthResponseDto, SignInDto } from "../types/api";
 
