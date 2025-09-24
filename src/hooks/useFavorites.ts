@@ -55,7 +55,7 @@ export const useAddToFavorites = (): UseMutationResult<
 
       queryClient.setQueryData(
         [FAVORITES_QUERY_KEYS.CHECK, variables.movieId],
-        { isFavorited: true }
+        { isFavorite: true }
       );
     },
     onError: (error) => {
@@ -77,7 +77,7 @@ export const useRemoveFromFavorites = (): UseMutationResult<
       queryClient.invalidateQueries({ queryKey: [FAVORITES_QUERY_KEYS.LIST] });
 
       queryClient.setQueryData([FAVORITES_QUERY_KEYS.CHECK, movieId], {
-        isFavorited: false,
+        isFavorite: false,
       });
     },
   });
