@@ -1,0 +1,130 @@
+name: Android CI Development
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  build:
+    if: ${{ github.actor != 'GitHub Action' }}
+    runs-on: macos-latest
+    environment: Development
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: "20"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "tools platform-tools"
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: "3.16.x"
+
+      - name: Use cmake
+        run: cmake --version
+
+      - name: Install JS dependencies
+        run: |
+          npm i -g corepack
+          yarn install
+
+      - name: Create .env file
+        run: |
+          echo "API_URL value: ${{ secrets.API_URL }}"
+          echo "ANDROID_CLIENT_ID value: ${{ secrets.ANDROID_CLIENT_ID }}"
+          cat << EOF > .env.development
+          API_URL=${{ secrets.API_URL }}
+          REACT_APP_FIREBASE_DOMAIN=${{ secrets.REACT_APP_FIREBASE_DOMAIN }}
+          EXPO_CLIENT_ID=${{ secrets.EXPO_CLIENT_ID }}
+          ANDROID_CLIENT_ID=${{ secrets.ANDROID_CLIENT_ID }}
+          IOS_CLIENT_ID=${{ secrets.IOS_CLIENT_ID }}
+          WEB_CLIENT_ID=${{ secrets.WEB_CLIENT_ID }}
+          EOF
+
+      - name: Verify .env.development content
+        run: cat .env.development
+
+      - name: Grant execute permission for gradlew
+        run: |
+          cd ./android
+          chmod +x ./gradlew
+
+      - name: Decrypt keystore file
+        run: openssl enc -aes-256-cbc -d -in ./android/app/upload_keystore.enc -out ./android/app/upload_keystore -pbkdf2 -k ${{ secrets.DECRYPTION_KEYSTORE_PASSWORD }}
+
+      - name: Set up gradle.properties
+        run: |
+          echo "MYAPP_UPLOAD_STORE_FILE=upload_keystore" >> ./android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=dsconto_upload_key" >> ./android/gradle.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.STORE_PASSWORD }}" >> ./android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> ./android/gradle.properties
+
+      - name: Update versionCode in build.gradle
+        run: |
+          echo "run_number=$((20 + ${{ github.run_number }}))" >> $GITHUB_ENV
+
+      - name: Replace in file
+        run: |
+          sed -i '' "s/versionCode .*$/versionCode ${run_number}/g" ./android/app/build.gradle
+
+      - name: Update the versionName based on the commit message
+        run: |
+          MAJOR_PATTERN="[MAJOR]"
+          MINOR_PATTERN="[MINOR]"
+          VERSION_MAJOR=$(grep -E '^versionMajor = [0-9]+' ./android/version.properties | awk -F' = ' '{print $2}')
+          VERSION_MINOR=$(grep -E '^versionMinor = [0-9]+' ./android/version.properties | awk -F' = ' '{print $2}')
+          VERSION_PATCH=$(grep -E '^versionPatch = [0-9]+' ./android/version.properties | awk -F' = ' '{print $2}')
+
+          if echo "${{ github.event.head_commit.message }}" | grep -qF "${MAJOR_PATTERN}"; then
+            VERSION_MAJOR=$((VERSION_MAJOR + 1))
+            VERSION_MINOR=0
+            VERSION_PATCH=0
+          elif echo "${{ github.event.head_commit.message }}" | grep -qF "${MINOR_PATTERN}"; then
+            VERSION_MINOR=$((VERSION_MINOR + 1))
+            VERSION_PATCH=0
+          else
+            VERSION_PATCH=$((VERSION_PATCH + 1))
+          fi
+
+          VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+
+          echo "versionMajor = ${VERSION_MAJOR}" > ./android/version.properties
+          echo "versionMinor = ${VERSION_MINOR}" >> ./android/version.properties
+          echo "versionPatch = ${VERSION_PATCH}" >> ./android/version.properties
+
+          echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
+          sed -i '' "s/versionName \".*\"$/versionName \"${VERSION_NAME}\"/g" ./android/app/build.gradle
+          echo "New versionName is ${VERSION_NAME}"
+
+      - name: Build with Gradle
+        run: |
+          cd ./android
+          ./gradlew assembleDevelopmentRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-development-release
+          path: ./android/app/build/outputs/apk/development/release/app-development-release.apk
+
+      - name: Commit and push if version.properties changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add ./android/version.properties
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update version.properties"
+          git push

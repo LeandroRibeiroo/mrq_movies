@@ -1,155 +1,204 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
-import { Alert, Animated, Dimensions } from "react-native";
-import {
-  useCheckFavorite,
-  useToggleFavorite,
-} from "../../../../hooks/useFavorites";
-import { useMovieDetails } from "../../../../hooks/useMovies";
-import { styles as stylesFn } from "../styles";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Animated, LayoutChangeEvent, useWindowDimensions } from "react-native";
+import { useCheckFavorite } from "./useCheckFavorite";
+import { useToggleFavorite } from "./useToggleFavorite";
+import { useMovieDetails } from "./useMovieDetails";
+import { Genre, MovieDetails } from "./interfaces/movie-details";
+import { MovieView } from "./interfaces/movie-view";
+import { styles as detailsStyles } from "../styles";
 
-const useDetails = () => {
-  const { width, height } = Dimensions.get("window");
-  const HEADER_MAX_HEIGHT = height * 0.6;
-  const HEADER_MIN_HEIGHT = 100;
-  const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+const TMDB = {
+  img: (size: "w500" | "w1280", path?: string | null) =>
+    path ? `https://image.tmdb.org/t/p/${size}${path}` : undefined,
+};
 
-  const router = useRouter();
-  const { movieId } = useLocalSearchParams();
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const [contentHeight, setContentHeight] = useState(0);
-  const [scrollViewHeight, setScrollViewHeight] = useState(0);
-
+const useMovieParams = () => {
+  const { movieId } = useLocalSearchParams<{ movieId?: string | string[] }>();
   const movieIdString = Array.isArray(movieId) ? movieId[0] : movieId;
-  const movieIdNumber = movieIdString ? parseInt(movieIdString) : 1;
+  const parsed = movieIdString ? Number.parseInt(movieIdString, 10) : NaN;
+  const isValid = Number.isFinite(parsed) && parsed > 0;
+  return { movieId: isValid ? parsed : undefined, isValid };
+};
 
-  const {
-    data: movieDetails,
-    isLoading: movieLoading,
-    error: movieError,
-  } = useMovieDetails(movieIdNumber);
+const useMovieViewModel = (details: MovieDetails): MovieView | undefined => {
+  return useMemo(() => {
+    if (!details) return undefined;
 
-  const { data: favoriteStatus, isLoading: favoriteLoading } =
-    useCheckFavorite(movieIdNumber);
+    return {
+      id: details.id,
+      title: details.title ?? "N/A",
+      originalTitle: details.original_title ?? "N/A",
+      poster: TMDB.img("w500", details.poster_path),
+      backdropUrl: TMDB.img("w1280", details.backdrop_path),
+      synopsis: details.overview ?? "N/A",
+      year: details.release_date
+        ? new Date(details.release_date).getFullYear().toString()
+        : "N/A",
+      duration: details.runtime ? `${details.runtime} min` : "N/A",
+      genre: Array.isArray(details.genres)
+        ? details.genres.map((g: Genre) => g.name).join(", ")
+        : "N/A",
+      director: "N/A",
+      cast: "N/A",
+      rating:
+        typeof details.vote_average === "number"
+          ? details.vote_average.toFixed(1)
+          : "N/A",
+    };
+  }, [details]);
+};
 
-  const {
-    toggleFavorite: apiToggleFavorite,
-    isLoading: toggleLoading,
-    error: toggleError,
-  } = useToggleFavorite();
-
-  const movie = {
-    id: movieDetails?.id,
-    title: movieDetails?.title,
-    originalTitle: movieDetails?.original_title,
-    poster: `https://image.tmdb.org/t/p/w500${movieDetails?.poster_path}`,
-    backdropUrl: `https://image.tmdb.org/t/p/w1280${movieDetails?.backdrop_path}`,
-    synopsis: movieDetails?.overview,
-    year: movieDetails?.release_date
-      ? new Date(movieDetails?.release_date).getFullYear().toString()
-      : "N/A",
-    duration: movieDetails?.runtime ? `${movieDetails.runtime} min` : "N/A",
-    genre: movieDetails?.genres?.map((g) => g.name).join(", ") || "N/A",
-    director: "N/A",
-    cast: "N/A",
-    rating: movieDetails?.vote_average?.toFixed(1) || "N/A",
-    isFavorite: favoriteStatus?.isFavorite || false,
-  };
-
-  const isFavorite = favoriteStatus?.isFavorite || false;
-
-  const styles = stylesFn(width);
-
+const useHeaderAnimations = (
+  scrollY: Animated.Value,
+  maxHeight: number,
+  minHeight: number,
+  contentHeight: number,
+  scrollViewHeight: number
+) => {
+  const dist = maxHeight - minHeight;
   const headerHeight = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
-    outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+    inputRange: [0, dist],
+    outputRange: [maxHeight, minHeight],
     extrapolate: "clamp",
   });
 
   const imageOpacity = scrollY.interpolate({
-    inputRange: [
-      0,
-      HEADER_SCROLL_DISTANCE / 4,
-      HEADER_SCROLL_DISTANCE * 0.7,
-      HEADER_SCROLL_DISTANCE,
-    ],
+    inputRange: [0, dist / 4, dist * 0.7, dist],
     outputRange: [1, 0.8, 0.3, 0],
     extrapolate: "clamp",
   });
 
   const imageScale = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE * 0.5, HEADER_SCROLL_DISTANCE],
+    inputRange: [0, dist * 0.5, dist],
     outputRange: [1, 1.1, 1.3],
     extrapolate: "clamp",
   });
 
   const headerBackgroundOpacity = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE * 0.3, HEADER_SCROLL_DISTANCE],
+    inputRange: [0, dist * 0.3, dist],
     outputRange: [0, 0.3, 1],
     extrapolate: "clamp",
   });
 
   const titleOpacity = scrollY.interpolate({
     inputRange: [
-      HEADER_SCROLL_DISTANCE * 0.3,
-      HEADER_SCROLL_DISTANCE * 0.6,
-      HEADER_SCROLL_DISTANCE,
-      Math.max(HEADER_SCROLL_DISTANCE, contentHeight - scrollViewHeight),
+      dist * 0.3,
+      dist * 0.6,
+      dist,
+      Math.max(dist, contentHeight - scrollViewHeight),
     ],
     outputRange: [0, 0.7, 1, 1],
     extrapolate: "clamp",
   });
 
-  const handleGoBack = () => {
-    router.back();
-  };
-
-  const toggleFavorite = () => {
-    if (toggleLoading) return;
-
-    apiToggleFavorite(movieIdNumber, isFavorite || false);
-
-    if (toggleError) {
-      Alert.alert(
-        "Erro",
-        "Não foi possível atualizar os favoritos. Tente novamente.",
-        [{ text: "OK" }]
-      );
-    }
-  };
-
-  const handleContentSizeChange = (
-    contentWidth: number,
-    contentHeight: number
-  ) => {
-    setContentHeight(contentHeight);
-  };
-
-  const handleScrollViewLayout = (event: any) => {
-    setScrollViewHeight(event.nativeEvent.layout.height);
-  };
-
   return {
-    HEADER_MAX_HEIGHT,
-    contentHeight,
-    handleContentSizeChange,
-    handleGoBack,
-    handleScrollViewLayout,
-    headerBackgroundOpacity,
     headerHeight,
     imageOpacity,
     imageScale,
-    isFavorite,
-    movie,
-    scrollViewHeight,
-    scrollY,
-    styles,
+    headerBackgroundOpacity,
     titleOpacity,
-    toggleFavorite,
-    isLoading: movieLoading || favoriteLoading,
-    error: movieError,
-    toggleLoading,
   };
 };
 
-export { useDetails };
+function useFavorite(movieId?: number) {
+  const enabled = typeof movieId === "number";
+  const { data: favoriteStatus, isLoading: favoriteLoading } = useCheckFavorite(
+    movieId!,
+    enabled
+  );
+  const {
+    toggleFavorite: mutateToggle,
+    isLoading: toggleLoading,
+    error: lastActionError,
+  } = useToggleFavorite();
+
+  const isFavorite = !!favoriteStatus?.isFavorite;
+
+  const toggle = useCallback(() => {
+    if (!enabled || toggleLoading) return;
+    try {
+      mutateToggle(movieId!, isFavorite);
+    } catch {
+      // Erro exposto via lastActionError
+    }
+  }, [enabled, toggleLoading, mutateToggle, movieId, isFavorite]);
+
+  return {
+    isFavorite,
+    favoriteLoading,
+    toggleLoading,
+    toggle,
+    lastActionError,
+  };
+}
+
+export const useDetails = () => {
+  const { width, height } = useWindowDimensions();
+
+  const HEADER_MIN_HEIGHT = 100;
+  const HEADER_MAX_HEIGHT = Math.max(HEADER_MIN_HEIGHT + 1, height * 0.6);
+
+  const router = useRouter();
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [contentHeight, setContentHeight] = useState(0);
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+
+  const { movieId, isValid } = useMovieParams();
+
+  const {
+    data: movieDetails,
+    isLoading: movieLoading,
+    error: movieError,
+  } = useMovieDetails(movieId!, isValid);
+
+  const movie = movieDetails ? useMovieViewModel(movieDetails) : undefined;
+
+  const {
+    isFavorite,
+    favoriteLoading,
+    toggleLoading,
+    toggle,
+    lastActionError,
+  } = useFavorite(movieId);
+
+  const onContentSizeChange = useCallback(
+    (_w: number, h: number) => setContentHeight(h),
+    []
+  );
+
+  const styles = detailsStyles(width);
+
+  const onScrollViewLayout = useCallback((e: LayoutChangeEvent) => {
+    setScrollViewHeight(e.nativeEvent.layout.height);
+  }, []);
+  const goBack = useCallback(() => router.back(), [router]);
+
+  const anim = useHeaderAnimations(
+    scrollY,
+    HEADER_MAX_HEIGHT,
+    HEADER_MIN_HEIGHT,
+    contentHeight,
+    scrollViewHeight
+  );
+
+  return {
+    HEADER_MAX_HEIGHT,
+    HEADER_MIN_HEIGHT,
+    styles,
+    height,
+    movie,
+    isValidId: isValid,
+    isLoading: movieLoading || favoriteLoading,
+    error: movieError,
+    lastActionError,
+    isFavorite,
+    toggleFavorite: toggle,
+    toggleLoading,
+    scrollY,
+    ...anim,
+    onContentSizeChange,
+    onScrollViewLayout,
+    goBack,
+  };
+};

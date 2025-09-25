@@ -1,8 +1,8 @@
 import { Image } from "expo-image";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-import CustomInput from "../../../components/CustomInput/CustomInput";
-import { useSignIn } from "./hooks/useSignn";
+import CustomInput from "../../../shared/components/CustomInput/CustomInput";
+import { useSignIn } from "./hooks/useSignIn";
 import styles from "./styles";
 
 export default function SignIn() {

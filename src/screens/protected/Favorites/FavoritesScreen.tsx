@@ -2,39 +2,38 @@ import { useRouter } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
-  Dimensions,
+  FlatList,
   Image,
   ScrollView,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
-import ErrorComponent from "../../../components/ErrorComponent/ErrorComponent";
-import { useFavoritesList } from "../../../hooks/useFavorites";
+import ErrorComponent from "@/src/shared/components/ErrorComponent/ErrorComponent";
 import { styles as stylesFn } from "./styles";
-
-const { width } = Dimensions.get("window");
-const ITEM_WIDTH = (width - 60) / 2;
+import { useFavoritesList } from "./hooks/useFavoritesList";
+import { FavoriteResponse } from "../../../shared/interfaces/favorite-response";
 
 export default function FavoritesScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const { data: favoritesData, isLoading, error } = useFavoritesList();
 
   const favoriteMovies = favoritesData?.favorites || [];
 
+  const ITEM_WIDTH = (width - 60) / 2;
+
   const styles = stylesFn(ITEM_WIDTH);
 
-  const renderMovieItem = (
-    favorite: (typeof favoriteMovies)[0],
-    index: number
-  ) => (
+  const renderMovieItem = (favorite: FavoriteResponse, index: number) => (
     <TouchableOpacity
       key={favorite.id}
       testID={`favorite-item-${favorite.movieId}`}
       style={[styles.movieItem, { marginRight: index % 2 === 0 ? 20 : 0 }]}
-      onPress={() => {
-        router.push(`/(protected)/details?movieId=${favorite.movieId}` as any);
-      }}
+      onPress={() =>
+        router.push(`/(protected)/details?movieId=${favorite.movieId}`)
+      }
     >
       <Image
         testID={`favorite-poster-${favorite.movieId}`}
@@ -83,17 +82,13 @@ export default function FavoritesScreen() {
 
   return (
     <View testID="favorites-container" style={styles.container}>
-      <ScrollView
-        testID="favorites-scroll"
+      <FlatList
+        data={favoriteMovies}
+        renderItem={({ item, index }) => renderMovieItem(item, index)}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-      >
-        <View testID="favorites-grid" style={styles.moviesGrid}>
-          {favoriteMovies.map((favorite, index) =>
-            renderMovieItem(favorite, index)
-          )}
-        </View>
-      </ScrollView>
+      />
     </View>
   );
 }

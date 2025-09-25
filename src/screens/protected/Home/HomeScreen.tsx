@@ -3,28 +3,35 @@ import React from "react";
 import {
   ActivityIndicator,
   Dimensions,
+  FlatList,
   Image,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import ErrorComponent from "../../../components/ErrorComponent/ErrorComponent";
-import { usePopularMovies } from "../../../hooks/useMovies";
+import { useInfinitePopularMovies } from "./hooks/useInfinitePopularMovies";
 import { styles as stylesFn } from "./styles";
+import ErrorComponent from "@/src/shared/components/ErrorComponent/ErrorComponent";
+import { Movie } from "@/src/shared/interfaces/movie";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 60) / 2;
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { data: moviesData, isLoading, error } = usePopularMovies(1);
+  const {
+    data: moviesData,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfinitePopularMovies();
 
   const movies = moviesData?.results || [];
 
   const styles = stylesFn(ITEM_WIDTH);
 
-  const renderMovieItem = (movie: (typeof movies)[0], index: number) => (
+  const renderMovieItem = (movie: Movie, index: number) => (
     <TouchableOpacity
       key={movie.id}
       testID={`movie-item-${movie.id}`}
@@ -65,15 +72,25 @@ export default function HomeScreen() {
 
   return (
     <View testID="home-container" style={styles.container}>
-      <ScrollView
-        testID="movies-scroll"
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View testID="movies-grid" style={styles.moviesGrid}>
-          {movies.map((movie, index) => renderMovieItem(movie, index))}
-        </View>
-      </ScrollView>
+      <FlatList
+        data={movies}
+        renderItem={({ item }) => renderMovieItem(item, item.id)}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        columnWrapperStyle={styles.moviesGrid}
+        testID="movies-list"
+        onEndReached={() => {
+          if (hasNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={() =>
+          hasNextPage ? (
+            <ActivityIndicator size="large" color="#EC8B00" />
+          ) : null
+        }
+      />
     </View>
   );
 }

@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { QueryProvider } from "../providers/QueryProvider";
+import { QueryProvider } from "../shared/providers/QueryProvider";
 
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({
   children,

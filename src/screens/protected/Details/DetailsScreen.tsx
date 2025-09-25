@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ErrorComponent from "../../../components/ErrorComponent/ErrorComponent";
-import { useErrorHandler } from "../../../hooks/useErrorHandler";
+import ErrorComponent from "@/src/shared/components/ErrorComponent/ErrorComponent";
+import { useErrorHandler } from "@/src/shared/hooks/useErrorHandler";
 import { useDetails } from "./hooks/useDetails";
 
 export default function MovieDetailsScreen() {
@@ -17,9 +17,9 @@ export default function MovieDetailsScreen() {
 
   const {
     HEADER_MAX_HEIGHT,
-    handleContentSizeChange,
-    handleGoBack,
-    handleScrollViewLayout,
+    onContentSizeChange,
+    goBack,
+    onScrollViewLayout,
     headerBackgroundOpacity,
     headerHeight,
     imageOpacity,
@@ -75,7 +75,7 @@ export default function MovieDetailsScreen() {
         />
         <Animated.Image
           testID="details-backdrop"
-          source={{ uri: movie.backdropUrl }}
+          source={{ uri: movie?.backdropUrl }}
           style={[
             styles.headerImage,
             {
@@ -90,7 +90,7 @@ export default function MovieDetailsScreen() {
           <TouchableOpacity
             testID="details-back-button"
             style={styles.headerButton}
-            onPress={handleGoBack}
+            onPress={goBack}
           >
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
@@ -99,7 +99,7 @@ export default function MovieDetailsScreen() {
             testID="details-header-title"
             style={[styles.headerTitle, { opacity: titleOpacity }]}
           >
-            {movie.title}
+            {movie?.title}
           </Animated.Text>
 
           <TouchableOpacity
@@ -134,8 +134,8 @@ export default function MovieDetailsScreen() {
           { useNativeDriver: false }
         )}
         scrollEventThrottle={16}
-        onContentSizeChange={handleContentSizeChange}
-        onLayout={handleScrollViewLayout}
+        onContentSizeChange={onContentSizeChange}
+        onLayout={onScrollViewLayout}
       >
         {/* Spacer for header */}
         <View style={{ height: HEADER_MAX_HEIGHT - 50 }} />
@@ -144,13 +144,13 @@ export default function MovieDetailsScreen() {
           <View testID="details-movie-header" style={styles.movieHeader}>
             <View style={styles.movieBasicInfo}>
               <Text testID="details-movie-title" style={styles.movieTitle}>
-                {movie.title}
+                {movie?.title}
               </Text>
               <Text
                 testID="details-movie-subtitle"
                 style={styles.movieSubtitle}
               >
-                {movie.originalTitle}
+                {movie?.originalTitle}
               </Text>
             </View>
           </View>
@@ -158,7 +158,7 @@ export default function MovieDetailsScreen() {
           <View testID="details-synopsis-section" style={styles.section}>
             <Text style={styles.sectionTitle}>SINOPSE</Text>
             <Text testID="details-synopsis-text" style={styles.synopsis}>
-              {movie.synopsis}
+              {movie?.synopsis}
             </Text>
           </View>
 
@@ -171,7 +171,7 @@ export default function MovieDetailsScreen() {
                 </Text>
               </View>
               <Text testID="details-genre-text" style={styles.detailText}>
-                {movie.genre}
+                {movie?.genre}
               </Text>
             </View>
 
@@ -186,7 +186,7 @@ export default function MovieDetailsScreen() {
                 </Text>
               </View>
               <Text testID="details-director-text" style={styles.detailText}>
-                {movie.director}
+                {movie?.director}
               </Text>
             </View>
 
@@ -198,7 +198,7 @@ export default function MovieDetailsScreen() {
                 </Text>
               </View>
               <Text testID="details-cast-text" style={styles.detailText}>
-                {movie.cast}
+                {movie?.cast}
               </Text>
             </View>
 

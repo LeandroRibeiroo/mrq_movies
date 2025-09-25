@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
-import { useLogout } from "../../hooks/useAuth";
+import { useLogout } from "../../shared/hooks/useAuth";
 import FavoritesScreen from "../../screens/protected/Favorites/FavoritesScreen";
 import HomeScreen from "../../screens/protected/Home/HomeScreen";
 
