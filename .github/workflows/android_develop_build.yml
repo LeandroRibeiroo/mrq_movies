@@ -42,9 +42,6 @@ jobs:
           npm i -g corepack
           yarn install
 
-      - name: React Native Config
-        run: npx react-native-integrate react-native-config
-
       - name: Create .env file
         run: |
           cat << EOF > .env
@@ -57,7 +54,7 @@ jobs:
           chmod +x gradlew
 
       - name: Decrypt keystore file
-        run: openssl enc -aes-256-cbc -d -in android/app/keystore.jks.enc -out android/app/keystore.jks -pbkdf2 -k ${{ secrets.DECRYPTION_KEYSTORE_PASSWORD }}
+        run: openssl enc -aes-256-cbc -d -pbkdf2 -in android/app/keystore.jks.enc -out android/app/keystore.jks -k ${{ secrets.DECRYPTION_KEYSTORE_PASSWORD }}
 
       - name: Set up gradle.properties
         run: |
