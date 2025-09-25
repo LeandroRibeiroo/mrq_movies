@@ -56,6 +56,9 @@ jobs:
           cd android
           chmod +x gradlew
 
+      - name: Decrypt keystore file
+        run: openssl enc -aes-256-cbc -d -in android/app/keystore.jks.enc -out android/app/keystore.jks -pbkdf2 -k ${{ secrets.DECRYPTION_KEYSTORE_PASSWORD }}
+
       - name: Set up gradle.properties
         run: |
           # Path is relative to android/
