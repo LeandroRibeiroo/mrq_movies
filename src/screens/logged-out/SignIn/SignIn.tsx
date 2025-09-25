@@ -38,7 +38,11 @@ export default function SignIn() {
             placeholder="Digite seu usuário"
             icon="person-outline"
             error={errors.username}
-            onClear={usernameValue ? clearUsername : undefined}
+            onClear={
+              usernameValue && usernameValue.length > 0
+                ? clearUsername
+                : undefined
+            }
           />
 
           <CustomInput
@@ -49,7 +53,11 @@ export default function SignIn() {
             icon="lock-closed-outline"
             secureTextEntry
             error={errors.password}
-            onClear={passwordValue ? clearPassword : undefined}
+            onClear={
+              passwordValue && passwordValue.length > 0
+                ? clearPassword
+                : undefined
+            }
           />
 
           <TouchableOpacity

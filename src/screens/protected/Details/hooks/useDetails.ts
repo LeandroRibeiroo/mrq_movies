@@ -21,7 +21,9 @@ const useMovieParams = () => {
   return { movieId: isValid ? parsed : undefined, isValid };
 };
 
-const useMovieViewModel = (details: MovieDetails): MovieView | undefined => {
+const useMovieViewModel = (
+  details: MovieDetails | undefined
+): MovieView | undefined => {
   return useMemo(() => {
     if (!details) return undefined;
 
@@ -152,7 +154,7 @@ export const useDetails = () => {
     error: movieError,
   } = useMovieDetails(movieId!, isValid);
 
-  const movie = movieDetails ? useMovieViewModel(movieDetails) : undefined;
+  const movie = useMovieViewModel(movieDetails);
 
   const {
     isFavorite,

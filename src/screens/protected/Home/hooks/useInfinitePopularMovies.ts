@@ -1,16 +1,8 @@
-import {
-  useInfiniteQuery,
-  UseInfiniteQueryResult,
-} from "@tanstack/react-query";
-import { MOVIE_QUERY_KEYS } from "../utils/movieQueryKeys";
-import { ApiError } from "@/src/shared/interfaces/api-error";
-import { MoviesResponse } from "@/src/shared/interfaces/movie";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getPopularMovies } from "./services/getPopularMovies";
+import { MOVIE_QUERY_KEYS } from "./utils/movieQueryKeys";
 
-export const useInfinitePopularMovies = (): UseInfiniteQueryResult<
-  MoviesResponse,
-  ApiError
-> => {
+export const useInfinitePopularMovies = () => {
   return useInfiniteQuery({
     queryKey: [MOVIE_QUERY_KEYS.POPULAR, "infinite"],
     queryFn: ({ pageParam = 1 }) => getPopularMovies(pageParam),

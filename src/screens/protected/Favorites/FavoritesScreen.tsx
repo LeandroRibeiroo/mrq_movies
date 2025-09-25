@@ -30,7 +30,7 @@ export default function FavoritesScreen() {
     <TouchableOpacity
       key={favorite.id}
       testID={`favorite-item-${favorite.movieId}`}
-      style={[styles.movieItem, { marginRight: index % 2 === 0 ? 20 : 0 }]}
+      style={styles.movieItem}
       onPress={() =>
         router.push(`/(protected)/details?movieId=${favorite.movieId}`)
       }
@@ -83,10 +83,11 @@ export default function FavoritesScreen() {
   return (
     <View testID="favorites-container" style={styles.container}>
       <FlatList
+        numColumns={2}
         data={favoriteMovies}
         renderItem={({ item, index }) => renderMovieItem(item, index)}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.scrollContent}
+        columnWrapperStyle={styles.moviesGrid}
         showsVerticalScrollIndicator={false}
       />
     </View>

@@ -35,6 +35,8 @@ export const styles = (width: number) =>
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
+      paddingHorizontal: 20,
+      paddingTop: 20,
     },
     movieItem: {
       width: width,

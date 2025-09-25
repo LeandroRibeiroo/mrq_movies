@@ -42,12 +42,13 @@ export const styles = (width: number) =>
     },
     scrollContent: {
       padding: 20,
-      paddingBottom: 100,
     },
     moviesGrid: {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
+      paddingHorizontal: 20,
+      paddingTop: 20,
     },
     movieItem: {
       width: width,

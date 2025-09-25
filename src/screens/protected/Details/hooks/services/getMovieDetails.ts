@@ -1,4 +1,4 @@
-import apiClient from "@/src/shared/services/api";
+import { apiClient } from "@/src/shared/services/api";
 import { MovieDetails } from "../interfaces/movie-details";
 
 const getMovieDetails = async (movieId: number): Promise<MovieDetails> => {

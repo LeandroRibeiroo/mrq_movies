@@ -6,55 +6,80 @@ A modern React Native movie application built with Expo, featuring user authenti
 
 ### Core Functionality
 
-- **User Authentication**: Secure login system with JWT token management
-- **Movie Discovery**: Browse popular movies with infinite scrolling
-- **Movie Details**: Comprehensive movie information including cast, genres, ratings, and synopsis
-- **Favorites Management**: Add/remove movies from personal favorites list
-- **Responsive Design**: Optimized for both iOS and Android platforms
-- **Offline Support**: Cached data for improved performance
-- **Error Handling**: Comprehensive error management with user-friendly messages
+- **User Authentication**: Secure JWT-based login system with automatic token management and refresh
+- **Movie Discovery**: Browse popular movies with intelligent infinite scrolling and optimized loading
+- **Movie Details**: Comprehensive movie information with cast details, genres, ratings, synopsis, and high-quality imagery
+- **Favorites Management**: Seamless add/remove functionality with real-time synchronization and persistent storage
+- **Cross-Platform Design**: Fully responsive design optimized for iOS, Android, and web platforms
+- **Smart Caching**: Intelligent data caching with React Query for offline-first experience
+- **Advanced Error Handling**: Comprehensive error boundary system with retry mechanisms and user-friendly messaging
+- **Performance Optimization**: New Architecture support with React Compiler for enhanced performance
 
 ### User Experience
 
-- **Modern UI**: Clean, intuitive interface with smooth animations
-- **Dark Theme**: Eye-friendly dark theme design
-- **Loading States**: Beautiful loading indicators and skeleton screens
-- **Pull-to-Refresh**: Easy content refresh functionality
-- **Haptic Feedback**: Enhanced user interaction with haptic responses
+- **Modern UI**: Clean, intuitive interface with smooth Reanimated-powered animations and gestures
+- **Dark Theme**: Sophisticated dark theme design with consistent color palette and typography
+- **Advanced Loading States**: Beautiful loading indicators, skeleton screens, and progressive image loading
+- **Pull-to-Refresh**: Intuitive content refresh with haptic feedback and smooth animations
+- **Enhanced Interactions**: Rich haptic feedback, gesture handling, and edge-to-edge display support
+- **Accessibility**: Full accessibility support with proper labeling and navigation
+- **Type Safety**: Complete TypeScript integration with typed routes for enhanced developer experience
 
 ## 🏗️ Architecture
 
 ```
 src/
-├── app/                           # Expo Router file-based routing
-│   ├── (logged-out)/             # Authentication screens
-│   └── (protected)/              # Authenticated user screens
-├── components/                    # Reusable UI components
-│   ├── CustomInput/              # Form input component
-│   ├── ErrorBoundary/            # Error handling component
-│   └── ErrorComponent/           # Error display component
-├── hooks/                         # Custom React hooks
-├── interfaces/                    # Shared TypeScript interfaces
-├── providers/                     # Context providers
-├── screens/                       # Screen components organized by domain
-│   ├── logged-out/
-│   │   └── SignIn/               # Authentication domain
-│   │       ├── interface/        # Auth-specific interfaces
-│   │       ├── services/         # Auth-specific services
-│   │       └── hooks/            # Auth-specific hooks
-│   └── protected/
-│       ├── Home/                 # Movie browsing domain
-│       │   ├── interface/        # Movie interfaces
-│       │   └── services/         # Movie services
-│       ├── Details/              # Movie details domain
-│       │   ├── interface/        # Movie details interfaces
-│       │   └── services/         # Movie details services
-│       └── Favorites/            # Favorites domain
-│           ├── interface/        # Favorites interfaces
-│           └── services/         # Favorites services
-├── services/                      # Shared API services
-├── store/                         # Zustand state management
-└── theme/                         # Styling and theme configuration
+├── app/                           # Expo Router file-based routing with typed routes
+│   ├── _layout.tsx               # Root layout with providers and navigation
+│   ├── index.tsx                 # App entry point with auth routing
+│   ├── (logged-out)/             # Authentication route group
+│   │   ├── _layout.tsx           # Auth layout
+│   │   └── index.tsx             # Sign-in screen
+│   └── (protected)/              # Protected route group
+│       ├── _layout.tsx           # Protected layout with tab navigation
+│       ├── index.tsx             # Home screen
+│       └── details.tsx           # Movie details screen
+├── shared/                        # Shared application resources
+│   ├── components/               # Reusable UI components
+│   │   ├── CustomInput/          # Form input with validation
+│   │   ├── ErrorBoundary/        # Global error handling
+│   │   └── ErrorComponent/       # Error display component
+│   ├── hooks/                    # Custom React hooks
+│   │   ├── useAuth.ts            # Authentication hook
+│   │   ├── useAuthInit.ts        # Auth initialization
+│   │   ├── useErrorHandler.ts    # Error handling hook
+│   │   └── services/             # Hook-specific services
+│   ├── interfaces/               # Shared TypeScript interfaces
+│   │   ├── auth-response.ts      # Authentication types
+│   │   ├── movie.ts              # Movie data types
+│   │   ├── favorite-response.ts  # Favorites types
+│   │   └── api-error.ts          # Error types
+│   ├── providers/                # Context providers
+│   ├── services/                 # Shared API services
+│   ├── store/                    # Zustand state management
+│   │   ├── authStore.ts          # Authentication state
+│   │   └── [other stores]        # Feature-specific stores
+│   └── theme/                    # Styling and theme configuration
+└── screens/                      # Domain-organized screen components
+    ├── logged-out/
+    │   └── SignIn/               # Authentication domain
+    │       ├── SignIn.tsx        # Main sign-in component
+    │       ├── hooks/            # Auth-specific hooks
+    │       ├── services/         # Auth API services
+    │       └── interfaces/       # Auth type definitions
+    └── protected/
+        ├── Home/                 # Movie browsing domain
+        │   ├── HomeScreen.tsx    # Movie list with infinite scroll
+        │   ├── hooks/            # Home-specific hooks
+        │   └── services/         # Movie API services
+        ├── Details/              # Movie details domain
+        │   ├── DetailsScreen.tsx # Movie details view
+        │   ├── hooks/            # Details-specific hooks
+        │   └── services/         # Details API services
+        └── Favorites/            # Favorites domain
+            ├── FavoritesScreen.tsx # Favorites list view
+            ├── hooks/            # Favorites-specific hooks
+            └── services/         # Favorites API services
 ```
 
 ### 🎯 SOLID Principles Implementation
@@ -69,9 +94,10 @@ src/
 
 ### Core Framework
 
-- **React Native**: `0.81.4` - Mobile app development framework
-- **Expo**: `~54.0.10` - Development platform and toolchain
-- **TypeScript**: `~5.9.2` - Static type checking
+- **React Native**: `0.81.4` - Mobile app development framework with New Architecture enabled
+- **React**: `19.1.0` - JavaScript library for building user interfaces
+- **Expo**: `~54.0.10` - Development platform and toolchain with React Compiler experiments
+- **TypeScript**: `~5.9.2` - Static type checking with typed routes
 
 ### Navigation & Routing
 
@@ -89,6 +115,9 @@ src/
 - **Expo Vector Icons**: `^15.0.2` - Icon library
 - **React Native Reanimated**: `~4.1.0` - Advanced animations
 - **React Native Gesture Handler**: `~2.28.0` - Touch gesture system
+- **React Native Edge-to-Edge**: `^1.7.0` - Edge-to-edge display support
+- **Expo Image**: `~3.0.8` - Optimized image component
+- **Expo Symbols**: `~1.0.7` - Symbol rendering system
 
 ### Forms & Validation
 
@@ -100,12 +129,16 @@ src/
 - **Axios**: `^1.12.2` - HTTP client for API requests
 - **React Native MMKV**: `^3.3.3` - Fast key-value storage
 - **React Native Config**: `1.5.6` - Environment configuration
+- **React Native Worklets**: `0.5.1` - JavaScript worklets for performance
+- **React Native Nitro Modules**: `^0.29.6` - High-performance native modules
 
 ### Development & Testing
 
 - **Jest**: `^30.1.3` - Testing framework
 - **React Testing Library**: `^13.3.3` - Component testing utilities
 - **ESLint**: `^9.25.0` - Code linting and formatting
+- **Axios Mock Adapter**: `^2.1.0` - HTTP mocking for tests
+- **Jest Expo**: `~54.0.12` - Jest configuration for Expo projects
 
 ## 🚀 Getting Started
 
@@ -242,7 +275,11 @@ npm start              # Start Expo development server
 npm run android        # Run on Android emulator
 npm run ios           # Run on iOS simulator
 npm run web           # Run on web browser
-npm run lint          # Run ESLint
+npm run lint          # Run ESLint code analysis
+npm test              # Run Jest test suite
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Run tests with coverage report
+npm run test:verbose  # Run tests with detailed output
 npm run reset-project # Reset to blank project template
 ```
 
@@ -263,13 +300,18 @@ npm run reset-project # Reset to blank project template
 ## 📈 Performance Optimizations
 
 - **React Query**: Intelligent caching and background updates
-- **Image Optimization**: Efficient image loading and caching
+- **New Architecture**: React Native's new architecture for improved performance
+- **React Compiler**: Experimental React Compiler for automatic optimizations
+- **Worklets**: JavaScript worklets for high-performance animations and computations
+- **Nitro Modules**: High-performance native modules for critical operations
+- **Image Optimization**: Efficient image loading and caching with Expo Image
+- **Edge-to-Edge**: Modern edge-to-edge display support
 - **Code Splitting**: Lazy loading of screens and components
 - **Memory Management**: Proper cleanup of resources
 - **Bundle Optimization**: Minimized app size
 - **SOLID Architecture**: Maintainable and scalable code structure
 - **Domain-Driven Design**: Clear separation of concerns for better performance
-- **TypeScript**: Compile-time error detection and optimization
+- **TypeScript**: Compile-time error detection and optimization with typed routes
 
 ## 🤝 Contributing
 

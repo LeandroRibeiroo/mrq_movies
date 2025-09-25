@@ -18,7 +18,7 @@ export const useAddToFavorites = (): UseMutationResult<
   return useMutation({
     mutationFn: addToFavorites,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: [FAVORITES_QUERY_KEYS.CHECK] });
+      queryClient.invalidateQueries({ queryKey: [FAVORITES_QUERY_KEYS.LIST] });
 
       queryClient.setQueryData(
         [FAVORITES_QUERY_KEYS.CHECK, variables.movieId],

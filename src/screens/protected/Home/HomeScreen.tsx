@@ -25,9 +25,10 @@ export default function HomeScreen() {
     error,
     fetchNextPage,
     hasNextPage,
+    refetch,
   } = useInfinitePopularMovies();
 
-  const movies = moviesData?.results || [];
+  const movies = moviesData?.pages.flatMap((page) => page.results) || [];
 
   const styles = stylesFn(ITEM_WIDTH);
 
@@ -35,7 +36,7 @@ export default function HomeScreen() {
     <TouchableOpacity
       key={movie.id}
       testID={`movie-item-${movie.id}`}
-      style={[styles.movieItem, { marginRight: index % 2 === 0 ? 20 : 0 }]}
+      style={styles.movieItem}
       onPress={() => {
         router.push(`/(protected)/details?movieId=${movie.id}` as any);
       }}
@@ -63,9 +64,7 @@ export default function HomeScreen() {
       <ErrorComponent
         title="Erro ao carregar filmes"
         message="Não foi possível carregar a lista de filmes. Verifique sua conexão e tente novamente."
-        onRetry={() => {
-          // The query will automatically refetch
-        }}
+        onRetry={() => refetch()}
       />
     );
   }

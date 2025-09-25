@@ -63,6 +63,12 @@ export default function CustomInput({
             )}
           />
         </View>
+        {onClear && (
+          <TouchableOpacity onPress={onClear} style={styles.clearIcon}>
+            <Ionicons name="close-circle" size={20} color={theme.colors.gray} />
+          </TouchableOpacity>
+        )}
+
         {secureTextEntry && (
           <TouchableOpacity
             onPress={togglePasswordVisibility}
@@ -73,12 +79,6 @@ export default function CustomInput({
               size={20}
               color={theme.colors.gray}
             />
-          </TouchableOpacity>
-        )}
-
-        {onClear && (
-          <TouchableOpacity onPress={onClear} style={styles.clearIcon}>
-            <Ionicons name="close-circle" size={20} color={theme.colors.gray} />
           </TouchableOpacity>
         )}
       </View>
