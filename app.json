@@ -42,7 +42,16 @@
         }
       ],
       "expo-font",
-      "react-native-edge-to-edge"
+      "react-native-edge-to-edge",
+      [
+        "expo-signed",
+        {
+          "android": {
+            "storeFile": "app/keystore.jks",
+            "keyAlias": "upload"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

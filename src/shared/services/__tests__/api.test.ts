@@ -1,8 +1,6 @@
-import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { apiClient, API_BASE_URL } from "../api";
+import { apiClient } from "../api";
 import { tokenStorage } from "../storage";
-import { ApiError } from "../../interfaces/api-error";
 
 jest.mock("../storage", () => ({
   tokenStorage: {

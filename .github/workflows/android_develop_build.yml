@@ -42,26 +42,30 @@ jobs:
           npm i -g corepack
           yarn install
 
+      - name: Generate native code
+        run: npx expo prebuild --platform android --clean
+
+      - name: React Native Config
+        run: npx react-native-integrate react-native-config
+
       - name: Create .env file
         run: |
           cat << EOF > .env
-          API_URL=${{ secrets.API_URL }}
+          API_URL=${{ secrets.API_BASE_URL }}
           EOF
 
       - name: Grant execute permission for gradlew
         run: |
-          cd ./android
-          chmod +x ./gradlew
-
-      - name: Decrypt keystore file
-        run: openssl enc -aes-256-cbc -d -in ./android/app/upload_keystore.enc -out ./android/app/upload_keystore -pbkdf2 -k ${{ secrets.DECRYPTION_KEYSTORE_PASSWORD }}
+          cd android
+          chmod +x gradlew
 
       - name: Set up gradle.properties
         run: |
-          echo "MYAPP_UPLOAD_STORE_FILE=upload_keystore" >> ./android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=dsconto_upload_key" >> ./android/gradle.properties
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.STORE_PASSWORD }}" >> ./android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> ./android/gradle.properties
+          # Path is relative to android/
+          echo "MYAPP_UPLOAD_STORE_FILE=app/keystore.jks" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=upload" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.STORE_PASSWORD }}" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> android/gradle.properties
 
       - name: Update versionCode in build.gradle
         run: |
@@ -69,15 +73,15 @@ jobs:
 
       - name: Replace in file
         run: |
-          sed -i '' "s/versionCode .*$/versionCode ${run_number}/g" ./android/app/build.gradle
+          sed -i "s/versionCode .*$/versionCode ${run_number}/g" android/app/build.gradle
 
       - name: Update the versionName based on the commit message
         run: |
           MAJOR_PATTERN="[MAJOR]"
           MINOR_PATTERN="[MINOR]"
-          VERSION_MAJOR=$(grep -E '^versionMajor = [0-9]+' ./android/version.properties | awk -F' = ' '{print $2}')
-          VERSION_MINOR=$(grep -E '^versionMinor = [0-9]+' ./android/version.properties | awk -F' = ' '{print $2}')
-          VERSION_PATCH=$(grep -E '^versionPatch = [0-9]+' ./android/version.properties | awk -F' = ' '{print $2}')
+          VERSION_MAJOR=$(grep -E '^versionMajor = [0-9]+' android/version.properties | awk -F' = ' '{print $2}')
+          VERSION_MINOR=$(grep -E '^versionMinor = [0-9]+' android/version.properties | awk -F' = ' '{print $2}')
+          VERSION_PATCH=$(grep -E '^versionPatch = [0-9]+' android/version.properties | awk -F' = ' '{print $2}')
 
           if echo "${{ github.event.head_commit.message }}" | grep -qF "${MAJOR_PATTERN}"; then
             VERSION_MAJOR=$((VERSION_MAJOR + 1))
@@ -92,29 +96,40 @@ jobs:
 
           VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 
-          echo "versionMajor = ${VERSION_MAJOR}" > ./android/version.properties
-          echo "versionMinor = ${VERSION_MINOR}" >> ./android/version.properties
-          echo "versionPatch = ${VERSION_PATCH}" >> ./android/version.properties
+          echo "versionMajor = ${VERSION_MAJOR}" > android/version.properties
+          echo "versionMinor = ${VERSION_MINOR}" >> android/version.properties
+          echo "versionPatch = ${VERSION_PATCH}" >> android/version.properties
 
           echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
-          sed -i '' "s/versionName \".*\"$/versionName \"${VERSION_NAME}\"/g" ./android/app/build.gradle
+          sed -i "s/versionName \".*\"$/versionName \"${VERSION_NAME}\"/g" android/app/build.gradle
           echo "New versionName is ${VERSION_NAME}"
 
-      - name: Build with Gradle
+      - name: Build with Gradle (AAB for Play Store)
         run: |
-          cd ./android
+          cd android
+          ./gradlew bundleRelease
+
+      - name: Build APK for testing
+        run: |
+          cd android
           ./gradlew assembleRelease
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-development-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-development-release
-          path: ./android/app/build/outputs/apk/release/app-release.apk
+          name: app-development-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
 
       - name: Commit and push if version.properties changed
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add ./android/version.properties
+          git add android/version.properties
           git diff --quiet && git diff --staged --quiet || git commit -m "Update version.properties"
           git push

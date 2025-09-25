@@ -1,4 +1,4 @@
-import apiClient from "@/src/shared/services/api";
+import { apiClient } from "../../../../../shared/services/api";
 import { CheckFavoriteResponse } from "../interfaces/check-favorite-response";
 
 const checkIfFavorited = async (
