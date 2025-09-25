@@ -1,6 +1,6 @@
 # BRQ Movies 🎬
 
-A modern React Native movie application built with Expo, featuring user authentication, movie browsing, detailed movie information, and favorites management.
+A modern React Native movie application built with Expo, featuring user authentication, movie browsing, detailed movie information, and favorites management. 
 
 ## 📱 Features
 
