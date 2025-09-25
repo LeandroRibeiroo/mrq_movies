@@ -24,10 +24,10 @@ jest.mock("expo/src/winter/ImportMetaRegistry", () => ({
   },
 }));
 
-global.console = {
-  ...console,
-  error: jest.fn(),
-};
+// global.console = {
+//   ...console,
+//   error: jest.fn(),
+// };
 
 // Mock expo modules to prevent import scope errors
 jest.mock("expo/src/winter/runtime.native", () => ({}));

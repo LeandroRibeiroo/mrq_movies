@@ -58,8 +58,7 @@ jobs:
 
       - name: Set up gradle.properties
         run: |
-          # Path is relative to android/
-          echo "MYAPP_UPLOAD_STORE_FILE=app/keystore.jks" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_STORE_FILE=keystore.jks" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_ALIAS=upload" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.STORE_PASSWORD }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> android/gradle.properties
