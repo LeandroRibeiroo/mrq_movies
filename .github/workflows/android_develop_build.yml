@@ -42,9 +42,6 @@ jobs:
           npm i -g corepack
           yarn install
 
-      - name: Generate native code
-        run: npx expo prebuild --platform android --clean
-
       - name: React Native Config
         run: npx react-native-integrate react-native-config
 
