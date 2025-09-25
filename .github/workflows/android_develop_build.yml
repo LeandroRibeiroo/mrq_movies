@@ -2,12 +2,12 @@ name: Android CI Development
 
 on:
   push:
-    branches: [develop]
+    branches: [master]
 
 jobs:
   build:
     if: ${{ github.actor != 'GitHub Action' }}
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     environment: Development
 
     steps:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4.0.2
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -44,19 +44,9 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "API_URL value: ${{ secrets.API_URL }}"
-          echo "ANDROID_CLIENT_ID value: ${{ secrets.ANDROID_CLIENT_ID }}"
-          cat << EOF > .env.development
+          cat << EOF > .env
           API_URL=${{ secrets.API_URL }}
-          REACT_APP_FIREBASE_DOMAIN=${{ secrets.REACT_APP_FIREBASE_DOMAIN }}
-          EXPO_CLIENT_ID=${{ secrets.EXPO_CLIENT_ID }}
-          ANDROID_CLIENT_ID=${{ secrets.ANDROID_CLIENT_ID }}
-          IOS_CLIENT_ID=${{ secrets.IOS_CLIENT_ID }}
-          WEB_CLIENT_ID=${{ secrets.WEB_CLIENT_ID }}
           EOF
-
-      - name: Verify .env.development content
-        run: cat .env.development
 
       - name: Grant execute permission for gradlew
         run: |
@@ -113,13 +103,13 @@ jobs:
       - name: Build with Gradle
         run: |
           cd ./android
-          ./gradlew assembleDevelopmentRelease
+          ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-development-release
-          path: ./android/app/build/outputs/apk/development/release/app-development-release.apk
+          path: ./android/app/build/outputs/apk/release/app-release.apk
 
       - name: Commit and push if version.properties changed
         run: |
