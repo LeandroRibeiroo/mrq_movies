@@ -45,7 +45,7 @@ jobs:
       - name: Create .env file
         run: |
           cat << EOF > .env
-          API_URL=${{ secrets.API_BASE_URL }}
+          API_BASE_URL=${{ secrets.API_BASE_URL }}
           EOF
 
       - name: Grant execute permission for gradlew
